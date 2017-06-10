@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+    
+    <title>RPS - Multiplayer</title>
+</head>
+<body >
+
+<header class="navbar ">
+    <h2 class="navbar-brand">Rock Paper Scissors Game</h2>
+</header>
+
+<div class="container">
+    <div class ="name-part">
+        <input class="name-input" placeholder="Name" type="text">
+        <button type = "button" class = "btn" id = "start">
+            Start
+        </button>
+        <div class = "comm">
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col-6">
+            <section class="player number1 ">
+                <h3 class="names player1-name">player1</h3>
+                <div class="img rock" ><img class="image" src="/assets/images/rocks-to-identify.jpg"></div>
+                <div class="img paper" ><img class="image" src="/assets/images/paper2.jpeg"></div>
+                <div class="img scissors" ><img class="image" src="/assets/images/scissors.jpeg"></div>
+                <div class="results pl1">wins:  Loses:</div>
+            </section>
+            </div>
+            <div class=" col-6">
+            <section class="player number2">
+                <h3 class="names player2-name">player2</h3>
+                <div class="img rock" ><img class="image" src="/assets/images/rocks-to-identify.jpg"></div>
+                <div class="img paper" ><img class="image" src="/assets/images/paper2.jpeg"></div>
+                <div class="img scissors" ><img class="image" src="/assets/images/scissors.jpeg"></div>
+                <div class="results pl-2">wins:  Loses:</div>
+            </section> 
+        </div>
+    </div> 
+    <div class="msg-box">
+        <textarea class="text-area">
+        </textarea>
+        <div>
+        <input class="msg-input">
+        <button type="submit" class="msg-button">SEND</button>
+        </div>
+    </div>
+</div> 
+<footer class="footer">
+    &copy;Copyright2017 Kevin Tabesh
+</footer>
+<script src="assets/javascript/app.js"></script>
+
+</body>
+
+</html>
