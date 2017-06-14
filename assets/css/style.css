@@ -36,7 +36,18 @@ body{
     
 }
 .comm{
+    display: none;
     
+}
+.name-comm{
+    padding: 10px;
+    display: none;
+    
+}
+.turn-comm{
+    display: none;
+    padding: 10px;
+    color: brown;
 }
 .btn {
     width: 70px;
@@ -47,6 +58,7 @@ body{
     color: mediumspringgreen;
     border: 2px solid green;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    
 }
 .btn:hover {
     border-color: darkgreen;
@@ -61,8 +73,23 @@ section{
     letter-spacing: 1px;
     margin-bottom: 10px;
 }
+.img-1 {
+	
+}
+.chosen-img{
+    border-radius: 5px;
+    border: 1px solid gray;
+}
 .player{
-    color: darkslategray
+    color: darkslategray;
+    
+}
+.player1 {
+	display: none;
+    
+}
+.player2 {
+	display: none;
 }
 .names {
 	margin: 15px;
@@ -90,31 +117,41 @@ section{
 }
 .msg-box {
     border: 2px solid lightcoral;
-    margin-top: 10px;
+    margin: 10px 0;
     border-radius:10px;
     height: 140px;
     background: rgba(0, 0,0 , 0.2);
 }
+.msg-form{
+    margin: 5px 10%; 
+    width: 80%;
+}
 .text-area{
-    width: 340px;
+    margin: 0 10%;
+    width: 80%;
     height: 90px;
-    margin-top: 5px;
-    
+    background-color: white;
+    text-align: left;
 }
 .msg-input{
-    width: 285px;
+    width: 60%;
+    
 }
 .msg-button {
 	font-size: 13px;
     color: darkslategray;
     padding: 4px;
     border-radius: 0;
+
 }
 .msg-button:hover {
     
     
     background: rgba(0, 0,0 , 0.5);
     color: antiquewhite;
+}
+.msg-button{
+    
 }
 .footer{
     font-size: 12px;
