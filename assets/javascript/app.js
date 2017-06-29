@@ -10,98 +10,354 @@ var database = firebase.database();
 
 
 var player1 = {
-    key:"",
-    id:1,
-    name: "",
-    wins: 0,
-    loses: 0,
-    choice :""
+    key:"", id:1, name: "", wins: 0, loses: 0, choice :""
 };
 var player2 = {
-    key:"",
-    id:2,
-    name: "",
-    wins: 0,
-    loses: 0,
-    choice :""
+    key:"", id:2, name: "", wins: 0, loses: 0, choice :""
 };
-var isPlaer1SignedIn =false;
-var isPlaer2SignedIn =false;
-var fisrtChoice;
-var secondChoice;
-var turn ;
+
+var p1key="";
+var p1name="";
+var p1wins=0;
+var p1loses=0;
+var p1choice="";
+
+var p2key="";
+var p2name="";
+var p2wins=0;
+var p2loses=0;
+var p2choice="";
+
+var tie = false;
+var turning = 1;
 var connected = 0;
 var counter = 0;
-var pl1Key="";
-var pl2Key="";
+
 var choice1 = "";
 var choice2 = "";
+var flag=false;
+
 //================================= Connections =====================================
 
-$(".btn").on("click", function(event) {
+$("#start").on("click", function(event) {
     event.preventDefault();
     $(".name-input").hide();
-    $(".btn").hide();
-
-var turns;
+    $("#start").hide();
+    var con = database.ref();
     if(connected !=1) {
-        player1.name = $(".name-input").val().trim();
-        var con = database.ref().child("Players").push({
+        player1.name = ($(".name-input").val().trim()).toUpperCase();
+        var con1 = con.child("Players").child("1");
+        con1.set({
             id : player1.id,
             name: player1.name,
-            wins: player1.wins,
-            loses: player1.loses,
-            choice: player1.choice
-        });  
-        con.onDisconnect().remove();
-    }else if(connected ===1 ){
-        player2.name = $(".name-input").val().trim();
-        var conn = database.ref().child("Players").push({
-            connection : true
+            choice : "",
+            wins : player1.wins,
+            loses : player1.loses
         });
-        conn.onDisconnect().remove();
-        var con = database.ref().child("Players").push({ 
+        con1.onDisconnect().remove();
+    }else if(connected ===1 ){
+        player2.name = ($(".name-input").val().trim()).toUpperCase();
+        var con2 = con.child("Players").child("2");
+        con2.set({
             id : player2.id,
             name: player2.name,
-            wins: player2.wins,
-            loses: player2.loses,
-            choice: player2.choice
-        });  
-        con.onDisconnect().remove();
+            choice : "",
+            wins : player2.wins,
+            loses : player2.loses
+        });
+        con3 = con;
+        con3.update({
+            "turn" : 1
+        });
+        con2.onDisconnect().remove();
+        con3.child("turn").onDisconnect().remove();
     }
 });
-
 //----------------------------
 database.ref().child("Players").on("value", function(snap) {
     connected = snap.numChildren();
 });
-//----------------------------
+//=============================
 
+database.ref().child("Players").on("value", function(data){
+   
+    if(connected===1 ){
+        // console.log(data.val());
+        if(player1.name !== "") {
+            $(".name-comm").text("Hello "+data.child("1").val().name+"! You are Player"+ data.child("1").val().id);
+            $(".turn-comm").show();
+            $(".name-comm").show();
+            $(".choices1").show();
+            $(".player1-name").text("P1: "+data.child("1").val().name);
+            $(".pl1").text("Wins: "+data.child("1").val().wins+" Loses: "+data.child("1").val().loses);
+        };
+    }else if (connected === 2 ){
+        if(player2.name !== ""){
+            $(".name-comm").text("Hello "+player2.name+"! You are Player"+ player2.id);
+            $(".turn-comm").show();
+            $(".name-comm").show();
+            $(".choices2").show();
+            $(".player2-name").text("P2: "+player2.name);
+            $(".pl2").text("Wins: "+player2.wins+" Loses: "+player2.loses);
+        };
+        if(data.child("2").val().name !== "") {
+            $(".player1-name").text("P1: "+data.child("1").val().name);
+            $(".player2-name").text("P2: "+data.child("2").val().name);
+            $(".pl1").text("Wins: "+data.child("1").val().wins+" Loses: "+data.child("1").val().loses);
+            $(".pl2").text("Wins: "+data.child("2").val().wins+" Loses: "+data.child("2").val().loses);
+        }
+    };
+});
+//===========================
+database.ref("turn").on("value", function(data){
+    turning = data.val();
+    if(turning === 1){
+        $(".turn-comm").html("<h2> This is PLAYER 1 Turn </h2>");
+        player1Select(turning);
+       // console.log(turning);
+    }else if(turning === 2){
+        $(".turn-comm").html("<h2> This is PLAYER 2 Turn </h2>");
+        player2Select(turning);
+        $("#reset").show();
+      //  console.log(turning);
+    };
+});
+//----------------------------
+function player1Select(turning){
+    $(document).on("click",".img1", function(event) {
+        event.preventDefault();
+        if(turning ==1){
+            incTurn();
+            if (connected >=2 ){
+                $(".img1").hide();
+                var choice = this.id;
+                switch(choice){
+                    case "r": 
+                        player1.choice ="rock";
+                        updateChoice1("rock");
+                        $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/rocks-to-identify.png">');
+                        break;
+                    case "p":
+                        player1.choice ="paper";
+                        updateChoice1("paper");
+                        $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/paper2.png">');
+                        break;
+                    case "s":
+                        player1.choice ="scissors";
+                        updateChoice1("scissors");
+                        $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
+                        break;
+                };
+            };
+        };
+    });
+};
+//=============================
+function player2Select(turning){
+    $(document).on("click",".img2", function(event) {
+        event.preventDefault();
+//        if(turning == 2){
+       // decTurn();
+            if (connected ===2 && turning === 2){
+                $(".img2").hide();
+                var choice = this.id;
+                switch(choice){
+                    case "r": 
+                        player2.choice ="rock";
+                        updateChoice2("rock");
+                        $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/rocks-to-identify.png">');
+                        break;
+                    case "p":
+                        player2.choice ="paper";
+                        updateChoice2("paper");
+                       $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/paper2.png">');
+                        break;
+                    case "s":
+                        player2.choice ="scissors";
+                        updateChoice2("scissors");
+                        $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
+                        break;
+                };
+                
+                
+            };
+            
+//        };
+        
+    });
+    
+};
+
+//=============================
+
+
+$("#reset").on("click", function reset(){
+var pl1win =false;
+var pl2win =false;
+var w;
+var l;
+var ref = database.ref().child("Players");
+ref.on("value", function(snapshot) {
+if(snapshot.child("1").val().choice !="" && snapshot.child("2").val().choice != ""){
+  console.log(snapshot.child("1").val().choice);
+    if(snapshot.child("1").val().choice === "rock"){
+        if(snapshot.child("2").val().choice === "paper"){
+            pl2win =true;
+            w = (snapshot.child("2").val().wins)+1;
+            l = (snapshot.child("1").val().loses)+1;
+        }else if(snapshot.child("2").val().choice === "scissors"){
+            pl1win =true;
+            w = (snapshot.child("1").val().wins)+1;
+            l = (snapshot.child("2").val().loses)+1;
+        } 
+    }else if(snapshot.child("1").val().choice === "paper"){
+        if(snapshot.child("2").val().choice === "rock"){
+            pl1win =true;
+            w = (snapshot.child("1").val().wins)+1;
+            l = (snapshot.child("2").val().loses)+1;
+        }else if(snapshot.child("2").val().choice === "scissors"){
+            pl2win =true;
+            w = (snapshot.child("2").val().wins)+1;
+            l = (snapshot.child("1").val().loses)+1;
+        } 
+    }else if(snapshot.child("1").val().choice === "scissors"){
+        if(snapshot.child("2").val().choice === "rock"){
+            pl2win =true;
+            w = (snapshot.child("2").val().wins)+1;
+            l = (snapshot.child("1").val().loses)+1;
+        }else if(snapshot.child("2").val().choice === "paper"){
+            pl1win =true;
+            w = (snapshot.child("1").val().wins)+1;
+            l = (snapshot.child("2").val().loses)+1;
+        } 
+    }
+}
+});
+$("#reset").hide();
+decTurn();
+$(".choice1").hide();
+$(".choice2").hide();
+$(".img1").show();
+$(".img2").show();
+if (pl1win){
+    updateWins1(w);
+    updateLoses2(l);
+}else if(pl2win){
+    updateWins2(w);
+    updateLoses1(l);
+}
+updateChoice1("");
+updateChoice2("");  
+//var lo1;
+//var lo2;
+////    var ref = database.ref("Players");
+//ref.once("value")
+//  .then(function(snapshot) {
+////    var name = snapshot.child("name").val(); // {first:"Ada",last:"Lovelace"}
+////    var firstName = snapshot.child("name/first").val(); // "Ada"
+//    lo1 = snapshot.val(); // "Lovelace"
+//    lo2 = snapshot.val(); // null
+//  });
+//    console.log(lo1);
+//    console.log(lo2);
+
+//    updateChoice1("");
+//    updateChoice2("");
+//    updateWins1(p1wins);
+//    updateLoses1(p1loses);
+//    updateWins2(p2loses);
+//    updateLoses2(p2loses);
+    
+//    
+});
+
+
+//=============================
+//function checker(){
+    database.ref("Players").on("value", function(data){
+        if(connected === 2 && turning===2){
+            var pl1choice = data.child("1").val().choice;
+            var pl2choice = data.child("2").val().choice;
+            p1name = data.child("1").val().name;
+            p2name = data.child("2").val().name;
+            if (pl1choice != "" &&  pl2choice != ""){
+               // console.log(data);
+                $(".choice1").show();
+                $(".choice2").show();
+                choiceChecker(pl1choice, pl2choice);
+               // console.log(data.val());
+            }
+        }
+    });
+//}
+
+//=========================== Choice Checker Function =======
+function choiceChecker(p1, p2){
+    if(p1 === "rock"){
+        $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/rocks-to-identify.png">');
+        if(p2 === "rock"){
+            $(".turn-comm").html("<h2> Tie ! </h2>");
+            //tie =true;  
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/rocks-to-identify.png">');
+        }
+        if(p2 === "paper"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/paper2.png">');
+            $(".turn-comm").html("<h2> "+p2name+" WON ! </h2>");
+//            p1loses +=1;
+//            p2wins +=1;
+        }
+        if(p2 === "scissors"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
+            $(".turn-comm").html("<h2> "+p1name+" WON ! </h2>");
+//            p1wins +=1;
+//            p2loses +=1;
+        }
+    }else if(p1 === "paper"){
+        $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/paper2.png">');
+        if(p2 === "rock"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/rocks-to-identify.png">');
+            $(".turn-comm").html("<h2> "+p1name+" WON ! </h2>");
+//            p1wins +=1;
+//            p2loses +=1;
+        }
+        if(p2 === "paper"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/paper2.png">');
+            $(".turn-comm").html("<h2> Tie ! </h2>");
+            //tie =true; 
+        }
+        if(p2 === "scissors"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
+            $(".turn-comm").html("<h2> "+p2name+" WON ! </h2>");
+//            p1loses +=1;
+//            p2wins +=1;
+        }
+    }else if(p1 === "scissors"){
+        $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
+        if(p2 === "rock"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/rocks-to-identify.png">');
+            $(".turn-comm").html("<h2> "+p2name+" WON ! </h2>");
+//            p1loses +=1;
+//            p2wins +=1;
+        }
+        if(p2 === "paper"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/paper2.png">');
+            $(".turn-comm").html("<h2> "+p1name+" WON ! </h2>");
+//            p1wins +=1;
+//            p2loses +=1;
+        }
+        if(p2 === "scissors"){
+            $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
+            $(".turn-comm").html("<h2> Tie ! </h2>");
+            //tie =true;
+        }
+    }
+}
+
+//=============================
 var addPlayers = database.ref().child("Players") ;
 addPlayers.on("child_added", function(data){
-    if(player1.name !== "") {
-        $(".name-comm").text("Hello "+player1.name+"! You are Player"+ player1.id);
-        $(".turn-comm").show();
-        if(pl1Key ===""){
-            player1.key = data.key;
-            pl1Key=data.key;
-        }
-        $(".name-comm").show();
-        $(".player1").show();
-        $(".player1-name").text("P1: "+player1.name);
-        $(".pl1").text("Wins: "+player1.wins+" Loses: "+player1.loses);
-    }else if(player2.name !== ""){
-        $(".name-comm").text("Hello "+player2.name+"! You are Player"+ player2.id);
-        $(".turn-comm").show();
-        if(pl1Key ===""){
-            player2.key = data.key;
-            pl2Key=data.key; 
-        }
-        $(".name-comm").show();
-        $(".player2").show();
-        $(".player2-name").text("P2: "+player2.name);
-        $(".pl2").text("Wins: "+player2.wins+" Loses: "+player2.loses);
-    }
+   
+
 });
 
 //------------------
@@ -110,8 +366,10 @@ playersRef.on("child_removed", function(data) {
    var deletedPlayer = data.val();
 });
 
-//==================== Message =========================
-var msgRef = database.ref("Message/");
+
+
+//==================== chat =========================
+var msgRef = database.ref("chat/");
 msgRef.on("child_added", function(data) {
      $(".text-area").append("<div class='msgs'><span>"+ data.val().msg+ "</span></div>")   
 });
@@ -120,12 +378,13 @@ $(".msg-button").on("click", function(event){
     event.preventDefault();
     var msg = $(".msg-input").val().trim();
     if(player1.name != ""){
-        var con = database.ref().child("Message/").push({
+        var con = database.ref().child("chat/").push({
             msg: player1.name+" : "+msg
             });
         con.onDisconnect().remove();
+        
     }else if(player2.name != "") {
-        var con = database.ref().child("Message/").push({
+        var con = database.ref().child("chat/").push({
              msg: player2.name+" : "+msg
             }); 
         con.onDisconnect().remove();
@@ -133,148 +392,15 @@ $(".msg-button").on("click", function(event){
  $(".msg-input").val("");   
 });
 
-// ================== game ================================
-database.ref().on("value", function(data){
-    turn =data.val().turn;
-    if(turn === 1){
-        $(".turn-comm").html("<h2> This is PLAYER 1 turn </h2>");
-    }else if(turn === 2){
-        $(".turn-comm").html("<h2> This is PLAYER 2 turn </h2>");
-    }
-    $(".turn-comm").animate({opacity:0},200,"linear",function(){
-    $(this).animate({opacity:1},200);
-});
-    });
-
-$(document).on("click",".img1", function(event) {
-if(turn ==1){
-    incTurn();
-    if (connected >=3 ){
-        $(".img1").hide();
-        var choice = this.id;
-        switch(choice){
-            case "r": 
-                player1.choice ="rock";
-                updateChoice1("rock");
-                
-                $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="/assets/images/rocks-to-identify.png">');
-                break;
-            case "p":
-                player1.choice ="paper";
-                updateChoice1("Paper");
-                $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="/assets/images/paper2.png">');
-                break;
-            case "s":
-                player1.choice ="scissors";
-                updateChoice1("Scissors");
-                $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="/assets/images/scissors.png">');
-                break;
-        }
-    }
-//    var choiceRef =database.ref("Players/"+pl1Key);
-//    choiceRef.on("value", function(data) {
-//        var choice1 = data.val().choice;
-//        console.log("player 1 choice is " + choice1);
-//       
-//        
-//    });
-     
-}
-});
-
-$(document).on("click",".img2", function(event) {
-if(turn == 2){
-    decTurn();
-    if (connected >=3 ){
-        $(".img2").hide();
-        var choice = this.id;
-        switch(choice){
-            case "r": 
-                player2.choice ="rock";
-                updateChoice2("rock");
-                $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="/assets/images/rocks-to-identify.png">');
-                break;
-            case "p":
-                player2.choice ="paper";
-                updateChoice2("Paper");
-               $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="/assets/images/paper2.png">');
-                break;
-            case "s":
-                player2.choice ="scissors";
-                updateChoice2("Scissors");
-                $(".choice2").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="/assets/images/scissors.png">');
-                break;
-        }
-    }
-    //-------
-//        var choiceRef =database.ref("Players/"+pl2Key);
-//        choiceRef.on("value", function(data) {
-//        var choice2 = data.val().choice;
-//        console.log("player 2 choice is " + choice2);
-//        });
-        //----
-}
-});
-
-
-//====
-database.ref().on("child_added", function(data) {
-        if (data.child("Players/").exists() && data.child("Players/").exists()) {
-            $(".text-area").html(data.val().choice + data.val().choice);
-        console.log(data.child("Players/"+pl1Key).val().choice);
-           // var ch1 = data.child("Players/"+pl1Key).val().choice;
-        console.log(data.child("Players/"+pl2Key).val().choice);
-           // var ch2 = data.child("Players/"+pl2Key).val().choice;
-//        if( data.child("Players/").val().choice 
-//                != 
-//            data.child("Players/").val().choice){
-//            
-//            console.log("different");
-//        }else{
-//            console.log("same");
-//        }
-//            
-            
-          //console.log("idiot");  
-        }
-    });
-//====
-//database.ref().on("value", function(data) {
-//        if (data.child("Players/"+pl1Key).exists() && data.child("Players/"+pl2Key).exists()) {
-//            $(".text-area").html(data.child("Players/"+pl1Key).val().choice);
-//        console.log(data.child("Players/"+pl1Key).val().choice);
-//           // var ch1 = data.child("Players/"+pl1Key).val().choice;
-//        console.log(data.child("Players/"+pl2Key).val().choice);
-//           // var ch2 = data.child("Players/"+pl2Key).val().choice;
-//        if( data.child("Players/"+pl1Key).val().choice 
-//                != 
-//            data.child("Players/"+pl2Key).val().choice){
-//            
-//            console.log("different");
-//        }else{
-//            console.log("same");
-//        }
-//            
-//            
-//          //console.log("idiot");  
-//        }
-//    });
-//-------
-//        var choiceRef =database.ref("Players/"+pl2Key);
-//        choiceRef.on("value", function(data) {
-//        var choice2 = data.val().choice;
-//        console.log("player 2 choice is " + choice2);
-//        });
-        //----
 //================================= Functions =====================================
 function updateChoice1(choice){
-    var upd = database.ref().child("Players/"+pl1Key);
+    var upd = database.ref().child("Players/1");
     upd.update({
         "choice" : choice
     });
 }  
 function updateChoice2(choice){
-    var upd = database.ref().child("Players/"+pl2Key);
+    var upd = database.ref().child("Players/2");
     upd.update({
         "choice" : choice
     });
@@ -291,9 +417,32 @@ function decTurn(){
     dec.update({
        "turn": 1 
     });
-}
+};
+function updateWins1(result){
+    var upd = database.ref().child("Players/1");
+    upd.update({
+        "wins" : result
+    });
+} 
+function updateLoses1(result){
+    var upd = database.ref().child("Players/1");
+    upd.update({
+        "loses" : result
+    });
+} 
+function updateWins2(result){
+    var upd = database.ref().child("Players/2");
+    upd.update({
+        "wins" : result,
+    });
+} 
+function updateLoses2(result){
+    var upd = database.ref().child("Players/2");
+    upd.update({
+        "loses" : result
+    });
+} 
 
-        
 
 
 

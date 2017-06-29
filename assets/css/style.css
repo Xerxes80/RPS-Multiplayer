@@ -1,5 +1,5 @@
 body{
-    background: url("/assets/images/ignasi_pattern_s/ignasi_pattern_s.png");
+    background-image: url("../images/ignasi_pattern_s/ignasi_pattern_s.png");
     text-align: center;
     margin: 20px;
 }
@@ -19,14 +19,14 @@ body{
 }
 .container{
     width: 100%;
-    height: 546px;
+    height: 570px;
     overflow: auto;
 }
 .name-part{
     border: 2px solid lightcoral;
     margin-bottom: 10px;
     border-radius:10px;
-    height: 120px;
+    height: 135px;
     background: rgba(0, 0,0 , 0.2);
 }
 .name-input{
@@ -49,7 +49,7 @@ body{
     padding: 10px;
     color: brown;
 }
-.btn {
+#start {
     width: 70px;
     margin: 10px;
     background-color: red;
@@ -60,14 +60,25 @@ body{
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
     
 }
-.btn:hover {
+#start:hover {
+    border-color: darkgreen;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    opacity: 1;
+}
+#reset{
+    background-color: white;
+    font-size: 14px;
+    padding: 5px;
+    display: none;
+}
+#reset:hover {
     border-color: darkgreen;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
     opacity: 1;
 }
 section{
     border-radius:10px;
-    height: 250px;
+    height: 260px;
     background: rgba(0, 0,0 , 0.2);
     color: darkgray;
     letter-spacing: 1px;
@@ -84,11 +95,11 @@ section{
     color: darkslategray;
     
 }
-.player1 {
+.choices1 {
 	display: none;
-    
+     
 }
-.player2 {
+.choices2 {
 	display: none;
 }
 .names {
@@ -156,7 +167,7 @@ section{
 .footer{
     font-size: 12px;
     position: sticky;
-    padding: 21px;
+    padding: 20px;
     background: rgba(0, 0,0 , 0.3);
     color: lavender;
     margin: 0;
