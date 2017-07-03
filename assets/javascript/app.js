@@ -75,12 +75,12 @@ database.ref().child("Players").on("value", function(data){
         };
     }else if (connected === 2 ){
         if(player2.name !== ""){
-            $(".name-comm").text("Hello "+player2.name+"! You are Player"+ player2.id);
+            $(".name-comm").text("Hello "+data.child("2").val().name+"! You are Player"+ data.child("2").val().id);
             $(".turn-comm").show();
             $(".name-comm").show();
             $(".choices2").show();
-            $(".player2-name").text("P2: "+player2.name);
-            $(".pl2").text("Wins: "+player2.wins+" Loses: "+player2.loses);
+            $(".player2-name").text("P2: "+data.child("2").val().name);
+            $(".pl2").text("Wins: "+data.child("2").val().wins+" Loses: "+data.child("2").val().loses);
         };
         if(data.child("2").val().name !== "") {
             $(".player1-name").text("P1: "+data.child("1").val().name);
@@ -96,20 +96,27 @@ database.ref("turn").on("value", function(data){
     turning = data.val();
     if(turning === 1){
         $(".turn-comm").html("<h2> This is PLAYER 1 Turn </h2>");
-        player1Select(turning);
+
     }else if(turning === 2){
         $(".turn-comm").html("<h2> This is PLAYER 2 Turn </h2>");
-        player2Select(turning);
+
     };
 });
 //----------------------------
-function player1Select(turning){
+
+    database.ref("turn").on("value", function(data){
+        turning = data.val();
+    });
+
+    console.log(turning);
     $(document).on("click",".img1", function(event) {
         event.preventDefault();
+        $(".choices1").show();
         if (connected === 2 && turning === 1){
-            incTurn();
             $(".img1").hide();
+            $(".choice1").show();
             var choice = this.id;
+            console.log(choice);
             switch(choice){
                 case "r": 
                     player1.choice ="rock";
@@ -127,15 +134,21 @@ function player1Select(turning){
                     $(".choice1").html('<h1> Your Choise : </h1><br><img class="chosen-img" width=150px  src="assets/images/scissors.png">');
                     break;
             };
+            incTurn();
         };
     });
-};
+
 //=============================
-function player2Select(turning){
+
+    database.ref("turn").on("value", function(data){
+        turning = data.val();
+    });
     $(document).on("click",".img2", function(event) {
         event.preventDefault();
+        console.log(turning);
         if (connected ===2 && turning === 2){
             $(".img2").hide();
+            $(".choice2").show();
             var choice = this.id;
             switch(choice){
                 case "r": 
@@ -156,7 +169,6 @@ function player2Select(turning){
             };
         };
     });
-};
 
 //=============================
 
@@ -204,6 +216,7 @@ if(snapshot.child("1").val().choice !="" && snapshot.child("2").val().choice != 
 });
 $("#reset").hide();
 decTurn();
+turning=1;
 $(".choice1").hide();
 $(".choice2").hide();
 $(".img1").show();
@@ -285,22 +298,37 @@ function choiceChecker(p1, p2){
 }
 
 //==================== chat =========================
-var msgRef = database.ref("chat/");
-msgRef.on("child_added", function(data) {
-     $(".text-area").append("<div class='msgs'><span>"+ data.val().msg+ "</span></div>")   
+var msgRef1 = database.ref("Players/1/chat");
+var msgRef2 = database.ref("Players/2/chat");
+msgRef1.on("child_added", function(data) {
+    if (connected === 2){
+      console.log(connected);  
+    console.log(data.val());
+    $(".panel").prepend( "<p>"+data.val().msg+"</p>");
+    }else{
+        $(".panel").text( "");
+    };
+});
+msgRef2.on("child_added", function(data) {
+    if (connected === 2){
+        console.log(connected); 
+    console.log(data.val());
+        $(".panel").prepend( "<p>"+data.val().msg+"</p>"); 
+    }else {
+        $(".panel").text( "");
+    };
 });
 //-----------------
 $(".msg-button").on("click", function(event){
     event.preventDefault();
     var msg = $(".msg-input").val().trim();
     if(player1.name != ""){
-        var con = database.ref().child("chat/").push({
+        var con = database.ref().child("Players/1/chat/").push({
             msg: player1.name+" : "+msg
             });
         con.onDisconnect().remove();
-        
     }else if(player2.name != "") {
-        var con = database.ref().child("chat/").push({
+        var con = database.ref().child("Players/2/chat/").push({
              msg: player2.name+" : "+msg
             }); 
         con.onDisconnect().remove();
